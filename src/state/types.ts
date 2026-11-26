@@ -5,6 +5,17 @@ export const NoteColor = {
 	Rose: 'rose',
 } as const;
 
+export const NoteActionType = {
+	Create: 'create',
+	Delete: 'delete',
+	Load: 'load',
+	Move: 'move',
+	Raise: 'raise',
+	Resize: 'resize',
+	SetColor: 'setColor',
+	SetText: 'setText',
+} as const;
+
 export type NoteColor = (typeof NoteColor)[keyof typeof NoteColor];
 
 /** Pixels, relative to the board's top-left corner. */
@@ -40,11 +51,11 @@ export type NotesState = {
  * so it renders on top; `load` replaces all notes (e.g. when restoring from storage).
  */
 export type NoteAction =
-	| { type: 'create'; note: Note }
-	| { type: 'delete'; id: string }
-	| { type: 'load'; notes: readonly Note[] }
-	| { type: 'move'; id: string; x: number; y: number }
-	| { type: 'raise'; id: string }
-	| { type: 'resize'; id: string; width: number; height: number }
-	| { type: 'setColor'; id: string; color: NoteColor }
-	| { type: 'setText'; id: string; text: string };
+	| { type: typeof NoteActionType.Create; note: Note }
+	| { type: typeof NoteActionType.Delete; id: string }
+	| { type: typeof NoteActionType.Load; notes: readonly Note[] }
+	| { type: typeof NoteActionType.Move; id: string; x: number; y: number }
+	| { type: typeof NoteActionType.Raise; id: string }
+	| { type: typeof NoteActionType.Resize; id: string; width: number; height: number }
+	| { type: typeof NoteActionType.SetColor; id: string; color: NoteColor }
+	| { type: typeof NoteActionType.SetText; id: string; text: string };
