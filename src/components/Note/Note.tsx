@@ -63,6 +63,9 @@ export const Note = memo(function Note({
 	const trashStateRef = useRef<TrashState>(TrashState.Idle);
 	// Set by Escape, so the blur that follows discards the changes instead of saving them.
 	const discardEditRef = useRef(false);
+	// Whether the pointer crossed the drag threshold. A ref, not state, so the release handler
+	// sees it right away, even if the user lets go before React re-renders.
+	const hasMovedRef = useRef(false);
 
 	const raise = () => dispatch({ type: NoteActionType.Raise, id: note.id });
 
@@ -84,13 +87,15 @@ export const Note = memo(function Note({
 	const startDrag = usePointerDrag({
 		onMove: (delta, pointer) => {
 			// Ignore tiny movements, so clicks and double-clicks don't lift the note.
-			if (!dragOffset && Math.hypot(delta.x, delta.y) < DRAG_THRESHOLD) return;
+			if (!hasMovedRef.current && Math.hypot(delta.x, delta.y) < DRAG_THRESHOLD) return;
+			hasMovedRef.current = true;
 			setDragOffset(delta);
 			updateTrash(trashStateFor(pointer));
 		},
 		onEnd: (delta) => {
 			// Never crossed the drag threshold: it was a click, nothing to move.
-			if (!dragOffset) return;
+			if (!hasMovedRef.current) return;
+			hasMovedRef.current = false;
 			// Delete only if the trash was showing "Release to delete".
 			const shouldDelete = trashStateRef.current === TrashState.Active;
 			updateTrash(TrashState.Idle);
@@ -108,6 +113,7 @@ export const Note = memo(function Note({
 			dispatch({ type: NoteActionType.Move, id: note.id, x: target.x, y: target.y });
 		},
 		onCancel: () => {
+			hasMovedRef.current = false;
 			setDragOffset(null);
 			updateTrash(TrashState.Idle);
 		},
