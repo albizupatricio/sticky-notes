@@ -2,7 +2,7 @@ import { loadNotes } from './notesStorage';
 import type { Note } from './types';
 
 /** Simulated network latency, so the loading state is visible. */
-const LATENCY_MS = 600;
+export const LATENCY_MS = 600;
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 

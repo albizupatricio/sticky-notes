@@ -182,7 +182,7 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 				/>
 			)}
 			<button type="button" className={styles.addButton} onClick={addCenteredNote}>
-				Add Note
+				Add note
 			</button>
 			<p id={helpId} className={styles.srOnly}>
 				Press Enter to edit, arrow keys to move, Alt and arrow keys to resize, Delete to remove.
