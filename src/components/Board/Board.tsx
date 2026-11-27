@@ -3,6 +3,7 @@ import {
 	type MouseEvent,
 	type PointerEvent,
 	useCallback,
+	useId,
 	useMemo,
 	useRef,
 	useState,
@@ -47,6 +48,9 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 	const [draft, setDraft] = useState<Rect | null>(null);
 
 	const trashRef = useRef<HTMLDivElement>(null);
+
+	// One hidden help text for every note, linked with aria-describedby.
+	const helpId = useId();
 
 	// Drives how the trash looks while notes are dragged.
 	const [trashState, setTrashState] = useState<TrashState>(TrashState.Idle);
@@ -133,11 +137,22 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 		});
 	};
 
+	/** Adds a default-size note in the middle of the board (keyboard path). */
+	const addCenteredNote = () => {
+		const board = getBoardSize();
+		createNote({
+			...DEFAULT_NOTE_SIZE,
+			x: (board.width - DEFAULT_NOTE_SIZE.width) / 2,
+			y: (board.height - DEFAULT_NOTE_SIZE.height) / 2,
+		});
+	};
+
 	return (
 		<main
 			ref={boardRef}
 			className={styles.board}
 			aria-label="Board"
+			tabIndex={-1}
 			onPointerDown={handlePointerDown}
 			onDoubleClick={handleDoubleClick}
 		>
@@ -152,6 +167,7 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 					getTrashDistance={getTrashDistance}
 					onTrashStateChange={setTrashState}
 					startEditing={note.id === newNoteId}
+					helpId={helpId}
 				/>
 			))}
 			{draft && (
@@ -165,6 +181,13 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 					}}
 				/>
 			)}
+			<button type="button" className={styles.addButton} onClick={addCenteredNote}>
+				Add Note
+			</button>
+			<p id={helpId} className={styles.srOnly}>
+				Press Enter to edit, arrow keys to move, Alt and arrow keys to resize, Delete to remove.
+				Hold Shift for bigger steps.
+			</p>
 			<Trash ref={trashRef} state={trashState} zIndex={notes.length + 1} />
 		</main>
 	);

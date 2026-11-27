@@ -22,6 +22,11 @@
 	background-position: -1px -1px;
 }
 
+/* The board only receives focus from code (after a delete), so no ring. */
+.board:focus {
+	outline: none;
+}
+
 /* The rectangle shown while drawing a new note. */
 .draft {
 	position: absolute;
@@ -31,4 +36,38 @@
 	border-radius: 4px;
 	background: rgba(163, 209, 148, 0.08);
 	pointer-events: none;
+}
+
+/* Hidden until reached with the keyboard: the way to create a note without a mouse. */
+.addButton {
+	position: absolute;
+	top: 16px;
+	left: 16px;
+	z-index: 100000;
+	padding: 8px 14px;
+	border: 2px dashed var(--border-strong);
+	border-radius: 8px;
+	background: var(--header);
+	color: var(--text);
+	font: 600 14px var(--font-body);
+	cursor: pointer;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.addButton:focus-visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.srOnly {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
 }

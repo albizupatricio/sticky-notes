@@ -34,6 +34,8 @@ type NoteProps = {
 	onTrashStateChange: (state: TrashState) => void;
 	/** Opens the note in edit mode when it mounts (for newly created notes). */
 	startEditing: boolean;
+	/** Id of the hidden text that explains the keyboard shortcuts. */
+	helpId: string;
 };
 
 /** Pointer movement below this many pixels is a click, not a drag. */
@@ -42,19 +44,24 @@ const DRAG_THRESHOLD = 3;
 /** How close (in px) a dragged note must get before the trash expands. */
 const TRASH_NEAR_DISTANCE = 160;
 
+/** Arrow-key move step, in px; Shift uses the large one (one grid cell). */
+const KEY_STEP = 4;
+const KEY_STEP_LARGE = 24;
+
 export const Note = memo(function Note({
 	note,
 	zIndex,
 	dispatch,
 	getBoardSize,
+	getTrashDistance,
 	onTrashStateChange,
 	startEditing,
-	getTrashDistance,
+	helpId,
 }: NoteProps) {
 	// Live values while the pointer is down; the reducer is updated once, on release.
 	const [dragOffset, setDragOffset] = useState<Point | null>(null);
 	const [liveSize, setLiveSize] = useState<Size | null>(null);
-	const [isOverTrashNow, setOverTrashNow] = useState(false);
+	const [isOverTrash, setOverTrash] = useState(false);
 	const [isEditing, setEditing] = useState(startEditing);
 	// True while the delete animation plays; the note is removed when it ends.
 	const [isDeleting, setDeleting] = useState(false);
@@ -66,6 +73,7 @@ export const Note = memo(function Note({
 	// Whether the pointer crossed the drag threshold. A ref, not state, so the release handler
 	// sees it right away, even if the user lets go before React re-renders.
 	const hasMovedRef = useRef(false);
+	const articleRef = useRef<HTMLElement>(null);
 
 	const raise = () => dispatch({ type: NoteActionType.Raise, id: note.id });
 
@@ -73,7 +81,7 @@ export const Note = memo(function Note({
 		// Skip repeated values, so moving the pointer doesn't re-render on every event.
 		if (trashStateRef.current === state) return;
 		trashStateRef.current = state;
-		setOverTrashNow(state === TrashState.Active);
+		setOverTrash(state === TrashState.Active);
 		onTrashStateChange(state);
 	};
 
@@ -143,18 +151,55 @@ export const Note = memo(function Note({
 		startDrag(event);
 	};
 
-	const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
-		// Only the note's own exit animation, not one bubbling up from a child.
-		if (isDeleting && event.target === event.currentTarget) {
-			dispatch({ type: NoteActionType.Delete, id: note.id });
-		}
-	};
-
 	const handleResizePointerDown = (event: PointerEvent<HTMLElement>) => {
 		// Stop the note's own pointerdown from starting a move at the same time.
 		event.stopPropagation();
 		raise();
 		startResize(event);
+	};
+
+	const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
+		// Only the note's own exit animation, not one bubbling up from a child.
+		if (!isDeleting || event.target !== event.currentTarget) return;
+		// If this note had focus, hand it to the board so keyboard users aren't sent back to the top.
+		if (document.activeElement === articleRef.current) {
+			articleRef.current?.closest('main')?.focus();
+		}
+		dispatch({ type: NoteActionType.Delete, id: note.id });
+	};
+
+	/** Moves the note by a few pixels, kept inside the board. */
+	const moveBy = (dx: number, dy: number) => {
+		const target = clampToBoard({ ...note, x: note.x + dx, y: note.y + dy }, getBoardSize());
+		dispatch({ type: NoteActionType.Move, id: note.id, x: target.x, y: target.y });
+	};
+
+	/** Grows or shrinks the note, kept above the minimum size and inside the board. */
+	const resizeBy = (dw: number, dh: number) => {
+		dispatch({ type: NoteActionType.Resize, id: note.id, ...sizeFrom({ x: dw, y: dh }) });
+	};
+
+	/** Keyboard support for the focused note: edit, move, resize and delete without a mouse. */
+	const handleNoteKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+		// Keys typed in the textarea or on the color buttons belong to them.
+		if (event.target !== event.currentTarget) return;
+		const step = event.shiftKey ? KEY_STEP_LARGE : KEY_STEP;
+		// Arrows move the note; Alt + arrows resize it.
+		const nudge = event.altKey ? resizeBy : moveBy;
+		const actions: Record<string, () => void> = {
+			Enter: () => setEditing(true),
+			Delete: () => setDeleting(true),
+			Backspace: () => setDeleting(true),
+			ArrowLeft: () => nudge(-step, 0),
+			ArrowRight: () => nudge(step, 0),
+			ArrowUp: () => nudge(0, -step),
+			ArrowDown: () => nudge(0, step),
+		};
+		const action = actions[event.key];
+		if (!action) return;
+		// Stop the page from scrolling with the arrows.
+		event.preventDefault();
+		action();
 	};
 
 	/** Puts the caret at the end instead of the start. */
@@ -176,12 +221,12 @@ export const Note = memo(function Note({
 	};
 
 	const handleTextKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-		if (event.key === 'Escape') {
-			discardEditRef.current = true;
-			event.currentTarget.blur();
-		} else if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-			event.currentTarget.blur();
-		}
+		const isSave = event.key === 'Enter' && (event.metaKey || event.ctrlKey);
+		if (event.key !== 'Escape' && !isSave) return;
+		if (event.key === 'Escape') discardEditRef.current = true;
+		event.currentTarget.blur();
+		// Give focus back to the note, so keyboard users can keep working with it.
+		articleRef.current?.focus();
 	};
 
 	const x = note.x + (dragOffset?.x ?? 0);
@@ -190,7 +235,7 @@ export const Note = memo(function Note({
 	const className = [
 		styles.note,
 		dragOffset && styles.dragging,
-		isOverTrashNow && styles.overTrash,
+		isOverTrash && styles.overTrash,
 		isEditing && styles.editing,
 		isDeleting && styles.deleting,
 	]
@@ -199,11 +244,17 @@ export const Note = memo(function Note({
 
 	return (
 		<article
+			ref={articleRef}
 			className={className}
+			tabIndex={0}
+			aria-label={note.text ? `Note: ${note.text}` : 'Empty note'}
+			aria-describedby={helpId}
 			onPointerDown={handlePointerDown}
 			onDoubleClick={() => setEditing(true)}
+			onKeyDown={handleNoteKeyDown}
 			onAnimationEnd={handleAnimationEnd}
 			style={{
+				// Position with `translate` (applied first), so scale and rotate never move the note.
 				translate: `${x}px ${y}px`,
 				width,
 				height,
@@ -216,7 +267,7 @@ export const Note = memo(function Note({
 					className={`${styles.text} ${styles.editor}`}
 					defaultValue={note.text}
 					autoFocus
-					aria-label="Note text"
+					aria-label="Note text. Click outside or press Command Enter to save, Escape to cancel."
 					onFocus={handleTextFocus}
 					onBlur={handleTextBlur}
 					onKeyDown={handleTextKeyDown}
