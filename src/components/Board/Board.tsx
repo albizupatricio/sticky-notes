@@ -45,6 +45,9 @@ export function Board({ notes, dispatch }: BoardProps) {
 	// Drives how the trash looks while notes are dragged.
 	const [trashState, setTrashState] = useState<TrashState>(TrashState.Idle);
 
+	// The note just created, so it opens ready to type.
+	const [newNoteId, setNewNoteId] = useState<string | null>(null);
+
 	/** Whether a point in viewport coordinates is over the trash. */
 	const isOverTrash = useCallback((pointer: Point) => {
 		const trash = trashRef.current;
@@ -66,14 +69,11 @@ export function Board({ notes, dispatch }: BoardProps) {
 			width: Math.max(rect.width, MIN_NOTE_SIZE.width),
 			height: Math.max(rect.height, MIN_NOTE_SIZE.height),
 		};
+		const id = crypto.randomUUID();
+		setNewNoteId(id);
 		dispatch({
 			type: NoteActionType.Create,
-			note: {
-				...clampToBoard(sized, getBoardSize()),
-				id: crypto.randomUUID(),
-				color: NoteColor.Green,
-				text: '',
-			},
+			note: { ...clampToBoard(sized, getBoardSize()), id, color: NoteColor.Green, text: '' },
 		});
 	};
 
@@ -139,6 +139,7 @@ export function Board({ notes, dispatch }: BoardProps) {
 					getBoardSize={getBoardSize}
 					isOverTrash={isOverTrash}
 					onTrashStateChange={setTrashState}
+					startEditing={note.id === newNoteId}
 				/>
 			))}
 			{draft && (

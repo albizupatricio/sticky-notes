@@ -43,6 +43,8 @@
 	height: 100%;
 	box-sizing: border-box;
 	overflow: hidden;
+	/* Fade out the last lines when the text is longer than the note. */
+	mask-image: linear-gradient(to bottom, black calc(100% - 56px), transparent calc(100% - 18px));
 }
 
 .dragging {
@@ -94,4 +96,32 @@
 /* Feedback that releasing here will delete the note. */
 .overTrash {
 	opacity: 0.55;
+}
+
+/* The textarea looks exactly like the text it replaces. */
+.editor {
+	display: block;
+	width: 100%;
+	border: none;
+	outline: none;
+	resize: none;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: text;
+	user-select: text;
+	mask-image: none;
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(16, 19, 26, 0.35) transparent;
+}
+
+/* Clear ring outside the note, readable on the dark board for every note color. */
+.editing {
+	outline: 2px dashed var(--muted);
+	outline-offset: 4px;
+}
+
+.placeholder {
+	opacity: 0.45;
 }

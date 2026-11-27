@@ -28,6 +28,9 @@ export function usePointerDrag(handlers: DragHandlers) {
 		// Stop text selection and the browser's native drag from stealing the pointer.
 		event.preventDefault();
 
+		// preventDefault also keeps focus where it was, so finish any edit in progress.
+		if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+
 		const target = event.currentTarget;
 		const pointerId = event.pointerId;
 		const start: Point = { x: event.clientX, y: event.clientY };
