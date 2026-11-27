@@ -32,13 +32,13 @@ describe('notesStorage', () => {
 	});
 
 	it('returns an empty list for corrupt data', () => {
-		localStorage.setItem('sticky-notes:v1', 'not json');
+		localStorage.setItem('sticky-notes', 'not json');
 		expect(loadNotes()).toEqual([]);
 	});
 
 	it('drops entries that are not valid notes', () => {
 		localStorage.setItem(
-			'sticky-notes:v1',
+			'sticky-notes',
 			JSON.stringify([validNote, { id: 'b' }, { ...validNote, id: 'c', color: 'purple' }]),
 		);
 		expect(loadNotes()).toEqual([validNote]);

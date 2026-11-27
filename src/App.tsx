@@ -1,6 +1,6 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 
-import { Board } from './components/Board/Board';
+import { Board, type BoardHandle } from './components/Board/Board';
 import { Header } from './components/Header/Header';
 import { fetchNotes } from './model/notesApi';
 import { initialNotesState, notesReducer } from './model/notesReducer';
@@ -14,6 +14,9 @@ function App() {
 	const [isLoading, setLoading] = useState(true);
 	// Color for the next note the user creates.
 	const [newNoteColor, setNewNoteColor] = useState<NoteColor>(NoteColor.Green);
+
+	// Lets the header ask the board to add a note.
+	const boardRef = useRef<BoardHandle>(null);
 
 	// Initial load from the (mock) API.
 	useEffect(() => {
@@ -41,8 +44,11 @@ function App() {
 				noteCount={state.notes.length}
 				newNoteColor={newNoteColor}
 				onNewNoteColorChange={setNewNoteColor}
+				onAddNote={() => boardRef.current?.addNote()}
+				isLoading={isLoading}
 			/>
 			<Board
+				ref={boardRef}
 				notes={state.notes}
 				dispatch={dispatch}
 				newNoteColor={newNoteColor}

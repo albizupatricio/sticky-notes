@@ -6,7 +6,13 @@ import { Header } from './Header';
 
 describe('Header', () => {
 	const html = renderToStaticMarkup(
-		<Header noteCount={3} newNoteColor={NoteColor.Rose} onNewNoteColorChange={() => {}} />,
+		<Header
+			noteCount={3}
+			newNoteColor={NoteColor.Rose}
+			onNewNoteColorChange={() => {}}
+			onAddNote={() => {}}
+			isLoading={false}
+		/>,
 	);
 
 	it('shows the title as the page heading', () => {
@@ -21,5 +27,9 @@ describe('Header', () => {
 	it('includes the picker for the new note color, with the current one selected', () => {
 		expect(html).toContain('aria-label="New note color"');
 		expect(html).toContain('aria-checked="true" aria-label="rose"');
+	});
+
+	it('offers a button to add a note', () => {
+		expect(html).toContain('Add note');
 	});
 });

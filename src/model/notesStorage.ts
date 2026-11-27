@@ -1,7 +1,7 @@
 import { type Note, NoteColor } from './types';
 
 /** Versioned key, so a future change to the note shape can migrate or ignore old data. */
-const STORAGE_KEY = 'sticky-notes:v1';
+const STORAGE_KEY = 'sticky-notes';
 const COLORS = new Set<string>(Object.values(NoteColor));
 
 /** Reads the saved notes. Returns an empty list if there are none or the data is invalid. */

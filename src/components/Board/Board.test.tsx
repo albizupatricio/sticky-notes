@@ -40,8 +40,4 @@ describe('Board', () => {
 		expect(html.match(/<article/g)).toHaveLength(2);
 		expect(html).not.toContain('Start with a note');
 	});
-
-	it('always offers the keyboard way to add a note', () => {
-		expect(renderBoard([])).toContain('Add note');
-	});
 });

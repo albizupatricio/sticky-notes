@@ -8,9 +8,18 @@ type HeaderProps = {
 	noteCount: number;
 	newNoteColor: NoteColor;
 	onNewNoteColorChange: (color: NoteColor) => void;
+	onAddNote: () => void;
+	/** Disables "Add note" while notes load, so a new note isn't overwritten by the load. */
+	isLoading: boolean;
 };
 
-export function Header({ noteCount, newNoteColor, onNewNoteColorChange }: HeaderProps) {
+export function Header({
+	noteCount,
+	newNoteColor,
+	onNewNoteColorChange,
+	onAddNote,
+	isLoading,
+}: HeaderProps) {
 	return (
 		<header className={styles.header}>
 			<h1 className={styles.title}>
@@ -19,9 +28,16 @@ export function Header({ noteCount, newNoteColor, onNewNoteColorChange }: Header
 				<span className={styles.count}>{noteCount}</span>
 			</h1>
 			<ColorPicker label="New note color" value={newNoteColor} onChange={onNewNoteColorChange} />
+			<button type="button" className={styles.addButton} onClick={onAddNote} disabled={isLoading}>
+				<span aria-hidden="true">+</span> Add note
+			</button>
 			<ul className={styles.hints}>
 				<li>Drag on the board to add</li>
-				<li>Double-click to edit, click outside to save</li>
+				<li>Double-click to edit</li>
+				<li>
+					<kbd className={styles.kbd}>Delete</kbd>
+					Remove
+				</li>
 				<li>
 					<kbd className={styles.kbd}>Esc</kbd>
 					Cancel

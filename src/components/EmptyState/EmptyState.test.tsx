@@ -9,5 +9,6 @@ describe('EmptyState', () => {
 		expect(html).toContain('<h2');
 		expect(html).toContain('Start with a note');
 		expect(html).toContain('saved in this browser automatically');
+		expect(html).toContain('use Add note in the header');
 	});
 });

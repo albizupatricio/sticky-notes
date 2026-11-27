@@ -3,8 +3,10 @@ import {
 	type Dispatch,
 	type MouseEvent,
 	type PointerEvent,
+	type Ref,
 	useCallback,
 	useId,
+	useImperativeHandle,
 	useMemo,
 	useRef,
 	useState,
@@ -32,7 +34,13 @@ import styles from './Board.module.css';
 /** Pointer movement below this many pixels counts as a click, not a draw. */
 const CLICK_TOLERANCE = 4;
 
+/** What the board lets its parent do: add a note from outside, like the header button. */
+export type BoardHandle = {
+	addNote: () => void;
+};
+
 type BoardProps = {
+	ref?: Ref<BoardHandle>;
 	notes: readonly NoteModel[];
 	dispatch: Dispatch<NoteAction>;
 	/** Color for notes created on the board. */
@@ -41,7 +49,7 @@ type BoardProps = {
 	isLoading: boolean;
 };
 
-export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) {
+export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardProps) {
 	const boardRef = useRef<HTMLElement>(null);
 	// Where the draw started, relative to the board.
 	const drawStartRef = useRef<Point>({ x: 0, y: 0 });
@@ -141,7 +149,7 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 		});
 	};
 
-	/** Adds a default-size note in the middle of the board (keyboard path). */
+	/** Adds a default-size note in the middle of the board (the header's "Add note" button). */
 	const addCenteredNote = () => {
 		const board = getBoardSize();
 		createNote({
@@ -150,6 +158,9 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 			y: (board.height - DEFAULT_NOTE_SIZE.height) / 2,
 		});
 	};
+
+	// Lets the header's "Add note" button create a note in the middle of the board.
+	useImperativeHandle(ref, () => ({ addNote: addCenteredNote }));
 
 	return (
 		<main
@@ -160,15 +171,6 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 			onPointerDown={handlePointerDown}
 			onDoubleClick={handleDoubleClick}
 		>
-			{/* First in the tab order, so keyboard users can add a note before going through them all. */}
-			<button
-				type="button"
-				className={styles.addButton}
-				onClick={addCenteredNote}
-				disabled={isLoading}
-			>
-				Add note
-			</button>
 			{isLoading ? <Loading /> : notes.length === 0 && !draft && <EmptyState />}
 			{renderOrder.map((note) => (
 				<Note
@@ -200,8 +202,8 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 				/>
 			)}
 			<p id={helpId} className={styles.srOnly}>
-				Press Enter to edit, arrow keys to move, Alt and arrow keys to resize, Delete to remove.
-				Hold Shift for bigger steps.
+				Press Enter to edit, arrow keys to move, Alt and arrow keys to resize, Delete or Backspace
+				to remove. Hold Shift for bigger steps.
 			</p>
 			<Trash ref={trashRef} state={trashState} zIndex={notes.length + 1} />
 		</main>

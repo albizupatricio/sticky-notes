@@ -191,6 +191,7 @@ export const Note = memo(function Note({
 		const actions: Record<string, () => void> = {
 			Enter: () => setEditing(true),
 			Delete: () => setDeleting(true),
+			Backspace: () => setDeleting(true),
 			ArrowLeft: () => nudge(-step, 0),
 			ArrowRight: () => nudge(step, 0),
 			ArrowUp: () => nudge(0, -step),

@@ -10,8 +10,8 @@ export function EmptyState() {
 			<div className={styles.copy}>
 				<h2 className={styles.title}>Start with a note</h2>
 				<p className={styles.text}>
-					Drag anywhere on the board to draw one at the size you want, or double-click for a quick
-					one. Using a keyboard? Press Tab to add a note.
+					Drag anywhere on the board to draw one the size you want, double-click for a quick one, or
+					use Add note in the header.
 				</p>
 			</div>
 			<p className={styles.saved}>
