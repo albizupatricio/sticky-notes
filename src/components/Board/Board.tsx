@@ -19,6 +19,7 @@ import {
 	type Point,
 	type Rect,
 } from '../../model/types';
+import { EmptyState } from '../EmptyState/EmptyState';
 import { Note } from '../Note/Note';
 import { Trash } from '../Trash/Trash';
 import { TrashState } from '../Trash/trashState';
@@ -137,6 +138,7 @@ export function Board({ notes, dispatch, newNoteColor }: BoardProps) {
 			onPointerDown={handlePointerDown}
 			onDoubleClick={handleDoubleClick}
 		>
+			{notes.length === 0 && !draft && <EmptyState />}
 			{renderOrder.map((note) => (
 				<Note
 					key={note.id}

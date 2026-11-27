@@ -25,14 +25,6 @@
 
 /* Two stacked notes: green on top of rose. */
 .logo {
-	width: 16px;
-	height: 16px;
-	border-radius: 3px;
-	background: var(--note-green);
-	/* Dark edge around the front note separates it from the sand note behind. */
-	box-shadow:
-		0 0 0 1.5px var(--header),
-		4px 4px 0 -1px var(--note-sand);
 	translate: -1px -2px;
 }
 

@@ -1,0 +1,12 @@
+/* Green note in front of a sand one, with a dark edge between them. Proportions from the 16px header logo. */
+.logo {
+	display: inline-block;
+	flex: none;
+	width: var(--size);
+	height: var(--size);
+	border-radius: calc(var(--size) * 0.19);
+	background: var(--note-green);
+	box-shadow:
+		0 0 0 calc(var(--size) * 0.09) var(--header),
+		calc(var(--size) * 0.25) calc(var(--size) * 0.25) 0 calc(var(--size) * -0.06) var(--note-sand);
+}
