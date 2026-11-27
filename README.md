@@ -2,6 +2,8 @@
 
 A single-page sticky notes board built with React and TypeScript, without UI libraries.
 
+**Live demo: [albizupatricio.github.io/sticky-notes](https://albizupatricio.github.io/sticky-notes/)**
+
 ![The board with seven notes in the four colors, the header with the note count, the new note color, the Add note button and hints, and the trash in the bottom-right corner](docs/screenshot.png)
 
 ## Contents
@@ -28,37 +30,37 @@ A single-page sticky notes board built with React and TypeScript, without UI lib
 - **Bring to front:** the note you touch moves on top.
 - **Colors:** pick the color for new notes in the header, or change a note's color from its swatches.
 - **Saved automatically** in the browser (localStorage), loaded through a mock async API.
-- **Keyboard support:** everything above can be done without a mouse (see *Keyboard*).
+- **Keyboard support:** everything above can be done without a mouse (see _Keyboard_).
 - **Loading and empty states:** a loading state while notes arrive, and a short how-to on an empty board.
 
 ## Screenshots
 
-| | |
-|---|---|
-| ![Drawing a new note: a dashed rectangle in the selected color](docs/draw.png) | ![A note being dragged near the trash, which grows and says "Release to delete"](docs/trash.png) |
-| **Drawing a note** in the color picked in the header | **Deleting:** the trash grows as a note gets close and turns red when releasing will delete |
-| ![A note in edit mode with a dashed focus ring](docs/edit.png) | ![The board while loading: a spinner, "Loading your notes" and the Add note button disabled](docs/loading.png) |
-| **Editing** a note's text | **Loading:** the board blocks input and Add note is disabled until notes arrive |
-| ![Empty board with the logo, "Start with a note" and how to create one](docs/empty.png) | |
-| **Empty board** with a short how-to | |
+|                                                                                         |                                                                                                                |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| ![Drawing a new note: a dashed rectangle in the selected color](docs/draw.png)          | ![A note being dragged near the trash, which grows and says "Release to delete"](docs/trash.png)               |
+| **Drawing a note** in the color picked in the header                                    | **Deleting:** the trash grows as a note gets close and turns red when releasing will delete                    |
+| ![A note in edit mode with a dashed focus ring](docs/edit.png)                          | ![The board while loading: a spinner, "Loading your notes" and the Add note button disabled](docs/loading.png) |
+| **Editing** a note's text                                                               | **Loading:** the board blocks input and Add note is disabled until notes arrive                                |
+| ![Empty board with the logo, "Start with a note" and how to create one](docs/empty.png) |                                                                                                                |
+| **Empty board** with a short how-to                                                     |                                                                                                                |
 
 ## Keyboard
 
 Everything can be done without a mouse. Notes and controls follow the normal `Tab` order.
 
-| Keys | Where | Action |
-|---|---|---|
-| `Tab` / `Shift + Tab` | Anywhere | Moves focus through the header (new note color, **Add note**) and then the notes and their color swatches |
-| `Enter` | Add note | Creates a note in the center of the board, in the selected color, ready to type. Disabled while notes load |
-| `Enter` | Note | Edit its text |
-| `Cmd/Ctrl + Enter` | Editing | Save and return focus to the note |
-| `Esc` | Editing | Discard changes and return focus to the note |
-| Arrow keys | Note | Move it 4px |
-| `Alt` (`Option` on Mac) + arrow keys | Note | Resize it 4px: right/down grow, left/up shrink. The top-left corner stays fixed, as with the mouse handle |
-| `Shift` + any of the above | Note | Use 24px steps (one grid cell) |
-| `Delete` or `Backspace` | Note | Delete it. Both are bound because the key labeled "delete" on a Mac sends `Backspace`. It only works when the note itself has focus, not while editing its text |
-| `Enter` / `Space` | Color swatch | Change the note's color |
-| `Esc` | While dragging or drawing | Cancel |
+| Keys                                 | Where                     | Action                                                                                                                                                          |
+| ------------------------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Tab` / `Shift + Tab`                | Anywhere                  | Moves focus through the header (new note color, **Add note**) and then the notes and their color swatches                                                       |
+| `Enter`                              | Add note                  | Creates a note in the center of the board, in the selected color, ready to type. Disabled while notes load                                                      |
+| `Enter`                              | Note                      | Edit its text                                                                                                                                                   |
+| `Cmd/Ctrl + Enter`                   | Editing                   | Save and return focus to the note                                                                                                                               |
+| `Esc`                                | Editing                   | Discard changes and return focus to the note                                                                                                                    |
+| Arrow keys                           | Note                      | Move it 4px                                                                                                                                                     |
+| `Alt` (`Option` on Mac) + arrow keys | Note                      | Resize it 4px: right/down grow, left/up shrink. The top-left corner stays fixed, as with the mouse handle                                                       |
+| `Shift` + any of the above           | Note                      | Use 24px steps (one grid cell)                                                                                                                                  |
+| `Delete` or `Backspace`              | Note                      | Delete it. Both are bound because the key labeled "delete" on a Mac sends `Backspace`. It only works when the note itself has focus, not while editing its text |
+| `Enter` / `Space`                    | Color swatch              | Change the note's color                                                                                                                                         |
+| `Esc`                                | While dragging or drawing | Cancel                                                                                                                                                          |
 
 Moving and resizing with the keyboard follow the same rules as the mouse: notes stay inside the board and never get smaller than the minimum size. Arrow keys work on one axis at a time, as in most editors.
 
@@ -76,18 +78,20 @@ npm run format     # Prettier
 npm test           # unit and render tests (Vitest)
 ```
 
+Every push to `main` runs lint and tests in GitHub Actions and, if they pass, deploys the app to GitHub Pages (`.github/workflows/deploy.yml`).
+
 Built for desktop (minimum 1024×768). Tested manually on the current versions of Chrome, Firefox and Edge on macOS, with no visible differences between them.
 
 ## Tech stack
 
-| | |
-|---|---|
-| UI | React 19, TypeScript (strict, `noUncheckedIndexedAccess`) |
-| Styles | CSS Modules and CSS custom properties, no UI or CSS framework |
-| Build | Vite |
-| Tests | Vitest, with React's `renderToStaticMarkup` for components |
-| Quality | ESLint (with import sorting) and Prettier |
-| Runtime dependencies | `react` and `react-dom` only |
+|                      |                                                               |
+| -------------------- | ------------------------------------------------------------- |
+| UI                   | React 19, TypeScript (strict, `noUncheckedIndexedAccess`)     |
+| Styles               | CSS Modules and CSS custom properties, no UI or CSS framework |
+| Build                | Vite                                                          |
+| Tests                | Vitest, with React's `renderToStaticMarkup` for components    |
+| Quality              | ESLint (with import sorting) and Prettier                     |
+| Runtime dependencies | `react` and `react-dom` only                                  |
 
 ## Project structure
 
@@ -124,7 +128,7 @@ Tests use Vitest, which shares the Vite config, so TypeScript and ES modules wor
 - **Model and helpers:** the reducer (every action, and that raising the top note returns the same state so React skips the render), storage (round trip, corrupt data, invalid entries), the mock API (simulated latency with fake timers, storage mocked), the geometry helpers and `combineStyles`.
 - **Components:** every component (`Board`, `Note`, `Header`, `Trash`, `ColorPicker`, `EmptyState`, `Loading`, `Logo`) is rendered with React's `renderToStaticMarkup`, which needs no DOM and no extra dependency. These tests check what each one shows for given props (loading, empty and filled board; a note's text, position, color, placeholder and edit mode; the trash label per state) and the accessibility attributes, not interactions.
 
-The whole suite runs in under a second. Drag, resize and keyboard interactions were tested manually (see *Possible improvements*).
+The whole suite runs in under a second. Drag, resize and keyboard interactions were tested manually (see _Possible improvements_).
 
 ## Architecture
 
@@ -145,7 +149,7 @@ Data goes through `notesApi.ts`, an async mock with simulated latency that reads
 - **A single dark theme.** A light theme (or following the system's day/night setting) would mean defining and checking a second set of colors for every surface, note and state, so it was left for later. Since every color is already a variable, it would mostly mean adding a second set of values.
 - **A visible "Add note" button in the header.** It was first a button that only appeared when reached with `Tab`, for keyboard users. Moving it to the header made it discoverable for everyone, put it first in the tab order, and placed it next to the color it will use. It's styled like the rest of the header (dark surface, thin border) so it doesn't read as another note or another color.
 - **Props instead of context between `Board` and `Note`.** A note receives nine props, but they only go one level down and each one is explicit and typed, which also keeps tests simple. If the board's services were needed deeper in the tree, they'd move into a context.
-- **Accessibility:** everything can be done with the keyboard, focus is always visible, controls are labeled, color pickers are radio groups, each note links to a hidden description of its shortcuts for screen readers, contrast was checked on text and controls (one exception is listed under *Known issues*), and every animation respects `prefers-reduced-motion`.
+- **Accessibility:** everything can be done with the keyboard, focus is always visible, controls are labeled, color pickers are radio groups, each note links to a hidden description of its shortcuts for screen readers, contrast was checked on text and controls (one exception is listed under _Known issues_), and every animation respects `prefers-reduced-motion`.
 
 ## Known issues
 
