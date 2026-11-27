@@ -17,6 +17,7 @@ import {
 	NoteActionType,
 	type Point,
 } from '../../model/types';
+import { ColorPicker } from '../ColorPicker/ColorPicker';
 import { TrashState } from '../Trash/trashState';
 
 import styles from './Note.module.css';
@@ -195,6 +196,12 @@ export const Note = memo(function Note({
 					{note.text || 'Double-click to write'}
 				</p>
 			)}
+			<div className={styles.colors}>
+				<ColorPicker
+					value={note.color}
+					onChange={(color) => dispatch({ type: NoteActionType.SetColor, id: note.id, color })}
+				/>
+			</div>
 			<span
 				className={styles.resizeHandle}
 				onPointerDown={handleResizePointerDown}

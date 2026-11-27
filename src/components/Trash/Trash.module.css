@@ -9,7 +9,7 @@
 	width: 72px;
 	height: 72px;
 	overflow: hidden;
-	border: 2px dashed rgba(183, 191, 209, 0.35);
+	border: 2px dashed color-mix(in srgb, var(--ring) 45%, transparent);
 	border-radius: 16px;
 	color: var(--muted);
 	background: rgba(6, 8, 13, 0.6);
@@ -28,7 +28,7 @@
 .expanded {
 	width: 320px;
 	height: 120px;
-	border-color: var(--muted);
+	border-color: var(--ring);
 	background: var(--header);
 	box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.8);
 }

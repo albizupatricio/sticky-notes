@@ -125,3 +125,26 @@
 .placeholder {
 	opacity: 0.45;
 }
+
+/* Color picker: shown on hover or keyboard focus, hidden while dragging. */
+.colors {
+	position: absolute;
+	left: 8px;
+	bottom: 8px;
+	padding: 2px 4px;
+	border: 1px dashed var(--ring);
+	border-radius: 12px;
+	background: var(--header);
+	box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.6);
+	opacity: 0;
+	transition: opacity 120ms ease;
+}
+
+.note:hover .colors,
+.colors:has(:focus-visible) {
+	opacity: 1;
+}
+
+.dragging .colors {
+	opacity: 0;
+}

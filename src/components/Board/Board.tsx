@@ -28,6 +28,8 @@ import styles from './Board.module.css';
 /** Pointer movement below this many pixels counts as a click, not a draw. */
 const CLICK_TOLERANCE = 4;
 
+const NOTE_COLORS = Object.values(NoteColor);
+
 type BoardProps = {
 	notes: readonly NoteModel[];
 	dispatch: Dispatch<NoteAction>;
@@ -73,7 +75,12 @@ export function Board({ notes, dispatch }: BoardProps) {
 		setNewNoteId(id);
 		dispatch({
 			type: NoteActionType.Create,
-			note: { ...clampToBoard(sized, getBoardSize()), id, color: NoteColor.Green, text: '' },
+			note: {
+				...clampToBoard(sized, getBoardSize()),
+				id,
+				color: NOTE_COLORS[notes.length % NOTE_COLORS.length] ?? NoteColor.Green,
+				text: '',
+			},
 		});
 	};
 
