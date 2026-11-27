@@ -20,6 +20,7 @@ import {
 	type Rect,
 } from '../../model/types';
 import { EmptyState } from '../EmptyState/EmptyState';
+import { Loading } from '../Loading/Loading';
 import { Note } from '../Note/Note';
 import { Trash } from '../Trash/Trash';
 import { TrashState } from '../Trash/trashState';
@@ -34,9 +35,11 @@ type BoardProps = {
 	dispatch: Dispatch<NoteAction>;
 	/** Color for notes created on the board. */
 	newNoteColor: NoteColor;
+	/** True while notes are loading: shows the loading state and blocks the board. */
+	isLoading: boolean;
 };
 
-export function Board({ notes, dispatch, newNoteColor }: BoardProps) {
+export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) {
 	const boardRef = useRef<HTMLElement>(null);
 	// Where the draw started, relative to the board.
 	const drawStartRef = useRef<Point>({ x: 0, y: 0 });
@@ -138,7 +141,7 @@ export function Board({ notes, dispatch, newNoteColor }: BoardProps) {
 			onPointerDown={handlePointerDown}
 			onDoubleClick={handleDoubleClick}
 		>
-			{notes.length === 0 && !draft && <EmptyState />}
+			{isLoading ? <Loading /> : notes.length === 0 && !draft && <EmptyState />}
 			{renderOrder.map((note) => (
 				<Note
 					key={note.id}
