@@ -1,0 +1,19 @@
+.note {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 4px;
+	color: var(--note-text);
+	box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.7);
+	overflow: hidden;
+}
+
+.text {
+	margin: 0;
+	padding: 18px;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.5;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}

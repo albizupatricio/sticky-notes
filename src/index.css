@@ -13,7 +13,7 @@
 	--accent: #a3d194;
 	--danger: #e5686b;
 
-	/* Notes */
+	/* Notes: one variable per NoteColor value, named --note-<color>. */
 	--note-green: #a3d194;
 	--note-slate: #b7bfd1;
 	--note-sand: #e2c98e;

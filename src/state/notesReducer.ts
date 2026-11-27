@@ -1,5 +1,5 @@
 import { assertNever } from '../lib/assertNever';
-import { NoteActionType, type Note, type NoteAction, type NotesState } from './types';
+import { type Note, type NoteAction, NoteActionType, type NotesState } from './types';
 
 export const initialNotesState: NotesState = { notes: [] };
 
