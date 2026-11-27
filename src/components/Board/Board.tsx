@@ -1,4 +1,5 @@
 import {
+	type CSSProperties,
 	type Dispatch,
 	type MouseEvent,
 	type PointerEvent,
@@ -173,12 +174,16 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 			{draft && (
 				<div
 					className={styles.draft}
-					style={{
-						translate: `${draft.x}px ${draft.y}px`,
-						width: draft.width,
-						height: draft.height,
-						zIndex: notes.length,
-					}}
+					style={
+						{
+							translate: `${draft.x}px ${draft.y}px`,
+							width: draft.width,
+							height: draft.height,
+							zIndex: notes.length,
+							// Preview the color the new note will have.
+							'--draft-color': `var(--note-${newNoteColor})`,
+						} as CSSProperties
+					}
 				/>
 			)}
 			<button type="button" className={styles.addButton} onClick={addCenteredNote}>

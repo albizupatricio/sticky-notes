@@ -27,14 +27,14 @@
 	outline: none;
 }
 
-/* The rectangle shown while drawing a new note. */
+/* The rectangle shown while drawing a new note, in the color it will have. */
 .draft {
 	position: absolute;
 	top: 0;
 	left: 0;
-	border: 2px dashed var(--accent);
+	border: 2px dashed var(--draft-color);
 	border-radius: 4px;
-	background: rgba(163, 209, 148, 0.08);
+	background: color-mix(in srgb, var(--draft-color) 12%, transparent);
 	pointer-events: none;
 }
 
