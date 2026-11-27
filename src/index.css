@@ -1,0 +1,40 @@
+:root {
+	/* Surfaces */
+	--bg: #0a0e16;
+	--header: #06080d;
+	--surface: #121722;
+	--border: #2b2f36;
+
+	/* Text */
+	--text: #f6f7fa;
+	--muted: #b7bfd1;
+
+	/* Actions */
+	--accent: #a3d194;
+	--danger: #e5686b;
+
+	/* Notes */
+	--note-green: #a3d194;
+	--note-slate: #b7bfd1;
+	--note-sand: #e2c98e;
+	--note-rose: #e3a9b6;
+	--note-text: #10131a;
+
+	/* Type */
+	--font-body: 'Manrope', system-ui, sans-serif;
+	--font-heading: 'Bricolage Grotesque', var(--font-body);
+	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-body);
+}
