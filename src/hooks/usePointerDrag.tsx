@@ -1,6 +1,6 @@
 import { type PointerEvent as ReactPointerEvent, useEffect, useRef } from 'react';
 
-import type { Point } from '../state/types';
+import type { Point } from '../model/types';
 
 type DragHandlers = {
 	/** Called on every pointer move with the offset from where the drag started. */

@@ -7,7 +7,7 @@ import {
 	type NoteAction,
 	NoteActionType,
 	type Point,
-} from '../../state/types';
+} from '../../model/types';
 
 import styles from './Note.module.css';
 

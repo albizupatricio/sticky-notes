@@ -1,14 +1,27 @@
-import type { Rect } from '../state/types';
+import type { Point, Rect } from '../model/types';
 
 export type Size = { readonly width: number; readonly height: number };
 
+/** Limits `value` to the range [min, max]. */
+export function clamp(value: number, min: number, max: number): number {
+	return Math.min(Math.max(value, min), max);
+}
+
 /** Returns the rect moved so it stays fully inside a board of the given size. */
 export function clampToBoard(rect: Rect, board: Size): Rect {
-	const maxX = Math.max(0, board.width - rect.width);
-	const maxY = Math.max(0, board.height - rect.height);
 	return {
 		...rect,
-		x: Math.min(Math.max(rect.x, 0), maxX),
-		y: Math.min(Math.max(rect.y, 0), maxY),
+		x: clamp(rect.x, 0, Math.max(0, board.width - rect.width)),
+		y: clamp(rect.y, 0, Math.max(0, board.height - rect.height)),
+	};
+}
+
+/** Returns the rect between two corners, whatever direction the user dragged in. */
+export function rectFromPoints(a: Point, b: Point): Rect {
+	return {
+		x: Math.min(a.x, b.x),
+		y: Math.min(a.y, b.y),
+		width: Math.abs(a.x - b.x),
+		height: Math.abs(a.y - b.y),
 	};
 }
