@@ -9,6 +9,7 @@ import {
 	NoteActionType,
 	type Point,
 } from '../../model/types';
+import { TrashState } from '../Trash/trashState';
 
 import styles from './Note.module.css';
 
@@ -17,26 +18,57 @@ type NoteProps = {
 	zIndex: number;
 	dispatch: Dispatch<NoteAction>;
 	getBoardSize: () => Size;
+	/** Whether a point in viewport coordinates is over the trash. */
+	isOverTrash: (pointer: Point) => boolean;
+	/** Tells the board how the trash should look while this note is dragged. */
+	onTrashStateChange: (state: TrashState) => void;
 };
 
-export const Note = memo(function Note({ note, zIndex, dispatch, getBoardSize }: NoteProps) {
+export const Note = memo(function Note({
+	note,
+	zIndex,
+	dispatch,
+	getBoardSize,
+	isOverTrash,
+	onTrashStateChange,
+}: NoteProps) {
 	// Live values while the pointer is down; the reducer is updated once, on release.
 	const [dragOffset, setDragOffset] = useState<Point | null>(null);
 	const [liveSize, setLiveSize] = useState<Size | null>(null);
 
+	const [isOverTrashNow, setOverTrashNow] = useState(false);
+
+	const updateTrash = (state: TrashState) => {
+		setOverTrashNow(state === TrashState.Active);
+		onTrashStateChange(state);
+	};
+
 	const raise = () => dispatch({ type: NoteActionType.Raise, id: note.id });
 
 	const startDrag = usePointerDrag({
-		onMove: (delta) => setDragOffset(delta),
-		onEnd: (delta) => {
+		onMove: (delta, pointer) => {
+			setDragOffset(delta);
+			updateTrash(isOverTrash(pointer) ? TrashState.Active : TrashState.Ready);
+		},
+		onEnd: (delta, pointer) => {
+			// Check before resetting, while the trash still has its expanded size.
+			const shouldDelete = isOverTrash(pointer);
 			setDragOffset(null);
+			updateTrash(TrashState.Idle);
+			if (shouldDelete) {
+				dispatch({ type: NoteActionType.Delete, id: note.id });
+				return;
+			}
 			const target = clampToBoard(
 				{ ...note, x: note.x + delta.x, y: note.y + delta.y },
 				getBoardSize(),
 			);
 			dispatch({ type: NoteActionType.Move, id: note.id, x: target.x, y: target.y });
 		},
-		onCancel: () => setDragOffset(null),
+		onCancel: () => {
+			setDragOffset(null);
+			updateTrash(TrashState.Idle);
+		},
 	});
 
 	/** Size after growing by `delta`, kept above the minimum and inside the board. */
@@ -59,7 +91,10 @@ export const Note = memo(function Note({ note, zIndex, dispatch, getBoardSize }:
 	});
 
 	const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
+		if (event.button !== 0) return;
 		raise();
+		// Lift the note right away, before the pointer moves.
+		setDragOffset({ x: 0, y: 0 });
 		startDrag(event);
 	};
 
@@ -74,9 +109,13 @@ export const Note = memo(function Note({ note, zIndex, dispatch, getBoardSize }:
 	const y = note.y + (dragOffset?.y ?? 0);
 	const { width, height } = liveSize ?? note;
 
+	const className = [styles.note, dragOffset && styles.dragging, isOverTrashNow && styles.overTrash]
+		.filter(Boolean)
+		.join(' ');
+
 	return (
 		<article
-			className={dragOffset ? `${styles.note} ${styles.dragging}` : styles.note}
+			className={className}
 			onPointerDown={handlePointerDown}
 			style={{
 				transform: `translate(${x}px, ${y}px)`,

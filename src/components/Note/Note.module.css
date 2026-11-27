@@ -9,6 +9,11 @@
 	cursor: grab;
 	touch-action: none;
 	user-select: none;
+	transition:
+		box-shadow 180ms ease,
+		rotate 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+		scale 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+		opacity 120ms ease;
 }
 
 .note::before {
@@ -44,11 +49,18 @@
 	cursor: grabbing;
 	box-shadow: 0 30px 50px -14px rgba(0, 0, 0, 0.85);
 	rotate: -2deg;
+	scale: 1.03;
+	opacity: 0.8;
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.note {
+		transition: none;
+	}
+
 	.dragging {
 		rotate: none;
+		scale: none;
 	}
 }
 
@@ -77,4 +89,9 @@
 
 .note:hover .resizeHandle {
 	opacity: 1;
+}
+
+/* Feedback that releasing here will delete the note. */
+.overTrash {
+	opacity: 0.55;
 }

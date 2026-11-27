@@ -25,3 +25,13 @@ export function rectFromPoints(a: Point, b: Point): Rect {
 		height: Math.abs(a.y - b.y),
 	};
 }
+
+/** Whether `point` is inside `rect`, edges included. */
+export function pointInRect(point: Point, rect: Rect): boolean {
+	return (
+		point.x >= rect.x &&
+		point.x <= rect.x + rect.width &&
+		point.y >= rect.y &&
+		point.y <= rect.y + rect.height
+	);
+}

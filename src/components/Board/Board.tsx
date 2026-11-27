@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import { usePointerDrag } from '../../hooks/usePointerDrag';
-import { clamp, clampToBoard, rectFromPoints } from '../../lib/geometry';
+import { clamp, clampToBoard, pointInRect, rectFromPoints } from '../../lib/geometry';
 import { DEFAULT_NOTE_SIZE, MIN_NOTE_SIZE } from '../../model/noteSizes';
 import {
 	type Note as NoteModel,
@@ -20,6 +20,8 @@ import {
 	type Rect,
 } from '../../model/types';
 import { Note } from '../Note/Note';
+import { Trash } from '../Trash/Trash';
+import { TrashState } from '../Trash/trashState';
 
 import styles from './Board.module.css';
 
@@ -37,6 +39,17 @@ export function Board({ notes, dispatch }: BoardProps) {
 	const drawStartRef = useRef<Point>({ x: 0, y: 0 });
 	// The rectangle being drawn. UI-only, so it lives here and not in the reducer.
 	const [draft, setDraft] = useState<Rect | null>(null);
+
+	const trashRef = useRef<HTMLDivElement>(null);
+
+	// Drives how the trash looks while notes are dragged.
+	const [trashState, setTrashState] = useState<TrashState>(TrashState.Idle);
+
+	/** Whether a point in viewport coordinates is over the trash. */
+	const isOverTrash = useCallback((pointer: Point) => {
+		const trash = trashRef.current;
+		return trash ? pointInRect(pointer, trash.getBoundingClientRect()) : false;
+	}, []);
 
 	const getBoardSize = useCallback(() => {
 		const board = boardRef.current;
@@ -124,6 +137,8 @@ export function Board({ notes, dispatch }: BoardProps) {
 					zIndex={zIndexById.get(note.id) ?? 0}
 					dispatch={dispatch}
 					getBoardSize={getBoardSize}
+					isOverTrash={isOverTrash}
+					onTrashStateChange={setTrashState}
 				/>
 			))}
 			{draft && (
@@ -137,6 +152,7 @@ export function Board({ notes, dispatch }: BoardProps) {
 					}}
 				/>
 			)}
+			<Trash ref={trashRef} state={trashState} zIndex={notes.length + 1} />
 		</main>
 	);
 }

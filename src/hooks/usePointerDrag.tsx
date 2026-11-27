@@ -3,10 +3,10 @@ import { type PointerEvent as ReactPointerEvent, useEffect, useRef } from 'react
 import type { Point } from '../model/types';
 
 type DragHandlers = {
-	/** Called on every pointer move with the offset from where the drag started. */
-	onMove?: (delta: Point) => void;
+	/** Called on every pointer move. `pointer` is in viewport coordinates. */
+	onMove?: (delta: Point, pointer: Point) => void;
 	/** Called once when the pointer is released. */
-	onEnd?: (delta: Point) => void;
+	onEnd?: (delta: Point, pointer: Point) => void;
 	/** Called when the drag is cancelled (Escape, or the browser takes the pointer away). */
 	onCancel?: () => void;
 };
@@ -38,6 +38,8 @@ export function usePointerDrag(handlers: DragHandlers) {
 			y: e.clientY - start.y,
 		});
 
+		const pointerOf = (e: PointerEvent): Point => ({ x: e.clientX, y: e.clientY });
+
 		const cleanup = () => {
 			// Remove listeners before releasing capture, so releasing doesn't trigger a cancel.
 			target.removeEventListener('pointermove', handleMove);
@@ -50,11 +52,12 @@ export function usePointerDrag(handlers: DragHandlers) {
 			}
 		};
 
-		const handleMove = (e: PointerEvent) => handlersRef.current.onMove?.(deltaFrom(e));
+		const handleMove = (e: PointerEvent) =>
+			handlersRef.current.onMove?.(deltaFrom(e), pointerOf(e));
 
 		const handleUp = (e: PointerEvent) => {
 			cleanup();
-			handlersRef.current.onEnd?.(deltaFrom(e));
+			handlersRef.current.onEnd?.(deltaFrom(e), pointerOf(e));
 		};
 
 		const handleCancel = () => {
