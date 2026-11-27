@@ -27,5 +27,19 @@
 .board {
 	position: relative;
 	flex: 1;
+	min-height: 0;
 	overflow: hidden;
+	background-color: var(--board);
+	background-image:
+	/* Major lines every 120px, tinted with the accent green */
+		linear-gradient(rgba(163, 209, 148, 0.12) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(163, 209, 148, 0.12) 1px, transparent 1px),
+		/* Minor lines every 24px */ linear-gradient(rgba(163, 209, 148, 0.05) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(163, 209, 148, 0.05) 1px, transparent 1px);
+	background-size:
+		120px 120px,
+		120px 120px,
+		24px 24px,
+		24px 24px;
+	background-position: -1px -1px;
 }
