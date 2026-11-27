@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react';
 
+import { combineStyles } from '../../lib/combineStyles';
+
 import styles from './Logo.module.css';
 
 type LogoProps = {
@@ -12,7 +14,7 @@ type LogoProps = {
 export function Logo({ size = 16, className }: LogoProps) {
 	return (
 		<span
-			className={className ? `${styles.logo} ${className}` : styles.logo}
+			className={combineStyles(styles.logo, className)}
 			style={{ '--size': `${size}px` } as CSSProperties}
 			aria-hidden="true"
 		/>

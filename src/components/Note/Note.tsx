@@ -10,6 +10,7 @@ import {
 } from 'react';
 
 import { usePointerDrag } from '../../hooks/usePointerDrag';
+import { combineStyles } from '../../lib/combineStyles';
 import { clamp, clampToBoard, type Size } from '../../lib/geometry';
 import { MIN_NOTE_SIZE } from '../../model/noteSizes';
 import {
@@ -36,6 +37,8 @@ type NoteProps = {
 	startEditing: boolean;
 	/** Id of the hidden text that explains the keyboard shortcuts. */
 	helpId: string;
+	/** Called when a focused note is deleted, so the board can keep keyboard focus. */
+	onFocusedDelete: () => void;
 };
 
 /** Pointer movement below this many pixels is a click, not a drag. */
@@ -57,6 +60,7 @@ export const Note = memo(function Note({
 	onTrashStateChange,
 	startEditing,
 	helpId,
+	onFocusedDelete,
 }: NoteProps) {
 	// Live values while the pointer is down; the reducer is updated once, on release.
 	const [dragOffset, setDragOffset] = useState<Point | null>(null);
@@ -161,10 +165,8 @@ export const Note = memo(function Note({
 	const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
 		// Only the note's own exit animation, not one bubbling up from a child.
 		if (!isDeleting || event.target !== event.currentTarget) return;
-		// If this note had focus, hand it to the board so keyboard users aren't sent back to the top.
-		if (document.activeElement === articleRef.current) {
-			articleRef.current?.closest('main')?.focus();
-		}
+		// If this note had focus, let the board keep it so keyboard users aren't sent back to the top.
+		if (document.activeElement === articleRef.current) onFocusedDelete();
 		dispatch({ type: NoteActionType.Delete, id: note.id });
 	};
 
@@ -189,7 +191,6 @@ export const Note = memo(function Note({
 		const actions: Record<string, () => void> = {
 			Enter: () => setEditing(true),
 			Delete: () => setDeleting(true),
-			Backspace: () => setDeleting(true),
 			ArrowLeft: () => nudge(-step, 0),
 			ArrowRight: () => nudge(step, 0),
 			ArrowUp: () => nudge(0, -step),
@@ -214,7 +215,7 @@ export const Note = memo(function Note({
 			discardEditRef.current = false;
 			return;
 		}
-		const text = event.currentTarget.value;
+		const text = event.currentTarget.value.trim();
 		if (text !== note.text) {
 			dispatch({ type: NoteActionType.SetText, id: note.id, text });
 		}
@@ -232,15 +233,13 @@ export const Note = memo(function Note({
 	const x = note.x + (dragOffset?.x ?? 0);
 	const y = note.y + (dragOffset?.y ?? 0);
 	const { width, height } = liveSize ?? note;
-	const className = [
+	const className = combineStyles(
 		styles.note,
 		dragOffset && styles.dragging,
 		isOverTrash && styles.overTrash,
 		isEditing && styles.editing,
 		isDeleting && styles.deleting,
-	]
-		.filter(Boolean)
-		.join(' ');
+	);
 
 	return (
 		<article
@@ -264,7 +263,7 @@ export const Note = memo(function Note({
 		>
 			{isEditing ? (
 				<textarea
-					className={`${styles.text} ${styles.editor}`}
+					className={combineStyles(styles.text, styles.editor)}
 					defaultValue={note.text}
 					autoFocus
 					aria-label="Note text. Click outside or press Command Enter to save, Escape to cancel."
@@ -275,7 +274,7 @@ export const Note = memo(function Note({
 					onPointerDown={(event) => event.stopPropagation()}
 				/>
 			) : (
-				<p className={note.text ? styles.text : `${styles.text} ${styles.placeholder}`}>
+				<p className={combineStyles(styles.text, !note.text && styles.placeholder)}>
 					{note.text || 'Double-click to write'}
 				</p>
 			)}

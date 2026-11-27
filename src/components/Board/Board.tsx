@@ -70,6 +70,9 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 		return { width: board?.clientWidth ?? 0, height: board?.clientHeight ?? 0 };
 	}, []);
 
+	/** Keeps keyboard focus on the board when a focused note is deleted. */
+	const focusBoard = useCallback(() => boardRef.current?.focus(), []);
+
 	// Stable DOM order, so raising a note doesn't move its node and release pointer capture.
 	const renderOrder = useMemo(() => [...notes].sort((a, b) => a.id.localeCompare(b.id)), [notes]);
 	const zIndexById = useMemo(() => new Map(notes.map((note, i) => [note.id, i])), [notes]);
@@ -157,6 +160,15 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 			onPointerDown={handlePointerDown}
 			onDoubleClick={handleDoubleClick}
 		>
+			{/* First in the tab order, so keyboard users can add a note before going through them all. */}
+			<button
+				type="button"
+				className={styles.addButton}
+				onClick={addCenteredNote}
+				disabled={isLoading}
+			>
+				Add note
+			</button>
 			{isLoading ? <Loading /> : notes.length === 0 && !draft && <EmptyState />}
 			{renderOrder.map((note) => (
 				<Note
@@ -167,6 +179,7 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 					getBoardSize={getBoardSize}
 					getTrashDistance={getTrashDistance}
 					onTrashStateChange={setTrashState}
+					onFocusedDelete={focusBoard}
 					startEditing={note.id === newNoteId}
 					helpId={helpId}
 				/>
@@ -186,9 +199,6 @@ export function Board({ notes, dispatch, newNoteColor, isLoading }: BoardProps) 
 					}
 				/>
 			)}
-			<button type="button" className={styles.addButton} onClick={addCenteredNote}>
-				Add note
-			</button>
 			<p id={helpId} className={styles.srOnly}>
 				Press Enter to edit, arrow keys to move, Alt and arrow keys to resize, Delete to remove.
 				Hold Shift for bigger steps.

@@ -25,6 +25,7 @@ const renderNote = (changes: Partial<NoteModel> = {}, startEditing = false) =>
 			getTrashDistance={() => Infinity}
 			onTrashStateChange={() => {}}
 			startEditing={startEditing}
+			onFocusedDelete={() => {}}
 			helpId="help"
 		/>,
 	);

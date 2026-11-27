@@ -1,5 +1,6 @@
 import type { Ref } from 'react';
 
+import { combineStyles } from '../../lib/combineStyles';
 import { TrashState } from './trashState';
 
 import styles from './Trash.module.css';
@@ -10,15 +11,13 @@ type TrashProps = {
 	zIndex: number;
 };
 
-/** Drop target for deleting notes. It grows while a note is dragged; the board does the hit testing. */
+/** Drop target for deleting notes. It grows when a dragged note gets close; the board does the hit testing. */
 export function Trash({ ref, state, zIndex }: TrashProps) {
-	const className = [
+	const className = combineStyles(
 		styles.trash,
 		state !== TrashState.Idle && styles.expanded,
 		state === TrashState.Active && styles.active,
-	]
-		.filter(Boolean)
-		.join(' ');
+	);
 
 	return (
 		<div
