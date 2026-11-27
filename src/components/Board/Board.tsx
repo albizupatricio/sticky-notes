@@ -20,6 +20,7 @@ import {
 	type Rect,
 } from '../../model/types';
 import { Note } from '../Note/Note';
+
 import styles from './Board.module.css';
 
 /** Pointer movement below this many pixels counts as a click, not a draw. */

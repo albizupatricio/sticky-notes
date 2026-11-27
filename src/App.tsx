@@ -2,6 +2,7 @@ import { useReducer } from 'react';
 
 import { Board } from './components/Board/Board';
 import { initialNotesState, notesReducer } from './model/notesReducer';
+
 import styles from './App.module.css';
 
 function App() {
