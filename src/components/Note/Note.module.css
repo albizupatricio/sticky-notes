@@ -64,6 +64,10 @@
 		rotate: none;
 		scale: none;
 	}
+
+	.deleting {
+		animation-duration: 1ms;
+	}
 }
 
 /* Bottom-right corner handle for resizing. */
@@ -147,4 +151,19 @@
 
 .dragging .colors {
 	opacity: 0;
+}
+
+/* Shrinks and fades the note into the trash before it's removed. */
+.deleting {
+	pointer-events: none;
+	transform-origin: bottom right;
+	animation: note-out 100ms ease-in forwards;
+}
+
+@keyframes note-out {
+	to {
+		opacity: 0;
+		scale: 0.6;
+		transform: translate(16px, 16px);
+	}
 }

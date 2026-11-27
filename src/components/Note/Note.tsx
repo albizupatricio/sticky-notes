@@ -1,4 +1,5 @@
 import {
+	type AnimationEvent,
 	type Dispatch,
 	type FocusEvent,
 	type KeyboardEvent,
@@ -27,8 +28,8 @@ type NoteProps = {
 	zIndex: number;
 	dispatch: Dispatch<NoteAction>;
 	getBoardSize: () => Size;
-	/** Whether a point in viewport coordinates is over the trash. */
-	isOverTrash: (pointer: Point) => boolean;
+	/** Distance from a point in viewport coordinates to the trash; 0 when over it. */
+	getTrashDistance: (pointer: Point) => number;
 	/** Tells the board how the trash should look while this note is dragged. */
 	onTrashStateChange: (state: TrashState) => void;
 	/** Opens the note in edit mode when it mounts (for newly created notes). */
@@ -38,20 +39,25 @@ type NoteProps = {
 /** Pointer movement below this many pixels is a click, not a drag. */
 const DRAG_THRESHOLD = 3;
 
+/** How close (in px) a dragged note must get before the trash expands. */
+const TRASH_NEAR_DISTANCE = 160;
+
 export const Note = memo(function Note({
 	note,
 	zIndex,
 	dispatch,
 	getBoardSize,
-	isOverTrash,
 	onTrashStateChange,
 	startEditing,
+	getTrashDistance,
 }: NoteProps) {
 	// Live values while the pointer is down; the reducer is updated once, on release.
 	const [dragOffset, setDragOffset] = useState<Point | null>(null);
 	const [liveSize, setLiveSize] = useState<Size | null>(null);
 	const [isOverTrashNow, setOverTrashNow] = useState(false);
 	const [isEditing, setEditing] = useState(startEditing);
+	// True while the delete animation plays; the note is removed when it ends.
+	const [isDeleting, setDeleting] = useState(false);
 
 	// Last trash state shown during this drag. Releasing while it's Active deletes the note.
 	const trashStateRef = useRef<TrashState>(TrashState.Idle);
@@ -68,22 +74,33 @@ export const Note = memo(function Note({
 		onTrashStateChange(state);
 	};
 
+	/** Trash state for the current pointer: over it, near it, or far away. */
+	const trashStateFor = (pointer: Point): TrashState => {
+		const distance = getTrashDistance(pointer);
+		if (distance === 0) return TrashState.Active;
+		return distance < TRASH_NEAR_DISTANCE ? TrashState.Ready : TrashState.Idle;
+	};
+
 	const startDrag = usePointerDrag({
 		onMove: (delta, pointer) => {
 			// Ignore tiny movements, so clicks and double-clicks don't lift the note.
 			if (!dragOffset && Math.hypot(delta.x, delta.y) < DRAG_THRESHOLD) return;
 			setDragOffset(delta);
-			updateTrash(isOverTrash(pointer) ? TrashState.Active : TrashState.Ready);
+			updateTrash(trashStateFor(pointer));
 		},
 		onEnd: (delta) => {
+			// Never crossed the drag threshold: it was a click, nothing to move.
+			if (!dragOffset) return;
 			// Delete only if the trash was showing "Release to delete".
 			const shouldDelete = trashStateRef.current === TrashState.Active;
-			setDragOffset(null);
 			updateTrash(TrashState.Idle);
 			if (shouldDelete) {
-				dispatch({ type: NoteActionType.Delete, id: note.id });
+				// Keep the note where it was dropped while it animates out.
+				setDragOffset(delta);
+				setDeleting(true);
 				return;
 			}
+			setDragOffset(null);
 			const target = clampToBoard(
 				{ ...note, x: note.x + delta.x, y: note.y + delta.y },
 				getBoardSize(),
@@ -118,6 +135,13 @@ export const Note = memo(function Note({
 		if (event.button !== 0) return;
 		raise();
 		startDrag(event);
+	};
+
+	const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
+		// Only the note's own exit animation, not one bubbling up from a child.
+		if (isDeleting && event.target === event.currentTarget) {
+			dispatch({ type: NoteActionType.Delete, id: note.id });
+		}
 	};
 
 	const handleResizePointerDown = (event: PointerEvent<HTMLElement>) => {
@@ -162,6 +186,7 @@ export const Note = memo(function Note({
 		dragOffset && styles.dragging,
 		isOverTrashNow && styles.overTrash,
 		isEditing && styles.editing,
+		isDeleting && styles.deleting,
 	]
 		.filter(Boolean)
 		.join(' ');
@@ -171,8 +196,9 @@ export const Note = memo(function Note({
 			className={className}
 			onPointerDown={handlePointerDown}
 			onDoubleClick={() => setEditing(true)}
+			onAnimationEnd={handleAnimationEnd}
 			style={{
-				transform: `translate(${x}px, ${y}px)`,
+				translate: `${x}px ${y}px`,
 				width,
 				height,
 				background: `var(--note-${note.color})`,
@@ -198,6 +224,7 @@ export const Note = memo(function Note({
 			)}
 			<div className={styles.colors}>
 				<ColorPicker
+					label="Note color"
 					value={note.color}
 					onChange={(color) => dispatch({ type: NoteActionType.SetColor, id: note.id, color })}
 				/>

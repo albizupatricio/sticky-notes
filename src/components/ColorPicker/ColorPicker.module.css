@@ -16,7 +16,6 @@
 	cursor: pointer;
 }
 
-/* Dark edge so pastel swatches stand out on a pastel note. */
 .dot {
 	width: 16px;
 	height: 16px;
@@ -49,21 +48,14 @@
 	border-radius: 0;
 }
 
-.toolbar .swatch:focus-visible {
-	outline-color: var(--text);
-}
-
-.toolbar .dot {
-	box-shadow: none;
-}
-
 .toolbar .swatch[aria-checked='true'] {
 	background: var(--surface);
+	box-shadow: inset 0 0 0 1px var(--border);
 }
 
 .toolbar .swatch[aria-checked='true'] .dot {
 	outline: none;
 	box-shadow:
 		0 0 0 2px var(--surface),
-		0 0 0 3.5px var(--swatch);
+		0 0 0 4px var(--swatch);
 }

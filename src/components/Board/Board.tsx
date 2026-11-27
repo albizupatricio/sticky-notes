@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import { usePointerDrag } from '../../hooks/usePointerDrag';
-import { clamp, clampToBoard, pointInRect, rectFromPoints } from '../../lib/geometry';
+import { clamp, clampToBoard, distanceToRect, rectFromPoints } from '../../lib/geometry';
 import { DEFAULT_NOTE_SIZE, MIN_NOTE_SIZE } from '../../model/noteSizes';
 import {
 	type Note as NoteModel,
@@ -28,14 +28,14 @@ import styles from './Board.module.css';
 /** Pointer movement below this many pixels counts as a click, not a draw. */
 const CLICK_TOLERANCE = 4;
 
-const NOTE_COLORS = Object.values(NoteColor);
-
 type BoardProps = {
 	notes: readonly NoteModel[];
 	dispatch: Dispatch<NoteAction>;
+	/** Color for notes created on the board. */
+	newNoteColor: NoteColor;
 };
 
-export function Board({ notes, dispatch }: BoardProps) {
+export function Board({ notes, dispatch, newNoteColor }: BoardProps) {
 	const boardRef = useRef<HTMLElement>(null);
 	// Where the draw started, relative to the board.
 	const drawStartRef = useRef<Point>({ x: 0, y: 0 });
@@ -50,10 +50,10 @@ export function Board({ notes, dispatch }: BoardProps) {
 	// The note just created, so it opens ready to type.
 	const [newNoteId, setNewNoteId] = useState<string | null>(null);
 
-	/** Whether a point in viewport coordinates is over the trash. */
-	const isOverTrash = useCallback((pointer: Point) => {
+	/** Distance from a point in viewport coordinates to the trash; 0 when over it. */
+	const getTrashDistance = useCallback((pointer: Point) => {
 		const trash = trashRef.current;
-		return trash ? pointInRect(pointer, trash.getBoundingClientRect()) : false;
+		return trash ? distanceToRect(pointer, trash.getBoundingClientRect()) : Infinity;
 	}, []);
 
 	const getBoardSize = useCallback(() => {
@@ -78,7 +78,7 @@ export function Board({ notes, dispatch }: BoardProps) {
 			note: {
 				...clampToBoard(sized, getBoardSize()),
 				id,
-				color: NOTE_COLORS[notes.length % NOTE_COLORS.length] ?? NoteColor.Green,
+				color: newNoteColor,
 				text: '',
 			},
 		});
@@ -144,7 +144,7 @@ export function Board({ notes, dispatch }: BoardProps) {
 					zIndex={zIndexById.get(note.id) ?? 0}
 					dispatch={dispatch}
 					getBoardSize={getBoardSize}
-					isOverTrash={isOverTrash}
+					getTrashDistance={getTrashDistance}
 					onTrashStateChange={setTrashState}
 					startEditing={note.id === newNoteId}
 				/>
@@ -153,7 +153,7 @@ export function Board({ notes, dispatch }: BoardProps) {
 				<div
 					className={styles.draft}
 					style={{
-						transform: `translate(${draft.x}px, ${draft.y}px)`,
+						translate: `${draft.x}px ${draft.y}px`,
 						width: draft.width,
 						height: draft.height,
 						zIndex: notes.length,

@@ -26,12 +26,9 @@ export function rectFromPoints(a: Point, b: Point): Rect {
 	};
 }
 
-/** Whether `point` is inside `rect`, edges included. */
-export function pointInRect(point: Point, rect: Rect): boolean {
-	return (
-		point.x >= rect.x &&
-		point.x <= rect.x + rect.width &&
-		point.y >= rect.y &&
-		point.y <= rect.y + rect.height
-	);
+/** Distance from `point` to the nearest edge of `rect`; 0 when the point is inside. */
+export function distanceToRect(point: Point, rect: Rect): number {
+	const dx = Math.max(rect.x - point.x, 0, point.x - (rect.x + rect.width));
+	const dy = Math.max(rect.y - point.y, 0, point.y - (rect.y + rect.height));
+	return Math.hypot(dx, dy);
 }
