@@ -5,7 +5,6 @@ import type { Point } from '../model/types';
 type DragHandlers = {
 	/** Called on every pointer move. `pointer` is in viewport coordinates. */
 	onMove?: (delta: Point, pointer: Point) => void;
-	/** Called once when the pointer is released. */
 	onEnd?: (delta: Point, pointer: Point) => void;
 	/** Called when the drag is cancelled (Escape, or the browser takes the pointer away). */
 	onCancel?: () => void;

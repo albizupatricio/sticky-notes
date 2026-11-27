@@ -31,7 +31,6 @@ type NoteProps = {
 	getBoardSize: () => Size;
 	/** Distance from a point in viewport coordinates to the trash; 0 when over it. */
 	getTrashDistance: (pointer: Point) => number;
-	/** Tells the board how the trash should look while this note is dragged. */
 	onTrashStateChange: (state: TrashState) => void;
 	/** Opens the note in edit mode when it mounts (for newly created notes). */
 	startEditing: boolean;
@@ -67,7 +66,6 @@ export const Note = memo(function Note({
 	const [liveSize, setLiveSize] = useState<Size | null>(null);
 	const [isOverTrash, setOverTrash] = useState(false);
 	const [isEditing, setEditing] = useState(startEditing);
-	// True while the delete animation plays; the note is removed when it ends.
 	const [isDeleting, setDeleting] = useState(false);
 
 	// Last trash state shown during this drag. Releasing while it's Active deletes the note.
@@ -89,7 +87,6 @@ export const Note = memo(function Note({
 		onTrashStateChange(state);
 	};
 
-	/** Trash state for the current pointer: over it, near it, or far away. */
 	const trashStateFor = (pointer: Point): TrashState => {
 		const distance = getTrashDistance(pointer);
 		if (distance === 0) return TrashState.Active;
@@ -108,11 +105,10 @@ export const Note = memo(function Note({
 			// Never crossed the drag threshold: it was a click, nothing to move.
 			if (!hasMovedRef.current) return;
 			hasMovedRef.current = false;
-			// Delete only if the trash was showing "Release to delete".
+
 			const shouldDelete = trashStateRef.current === TrashState.Active;
 			updateTrash(TrashState.Idle);
 			if (shouldDelete) {
-				// Keep the note where it was dropped while it animates out.
 				setDragOffset(delta);
 				setDeleting(true);
 				return;
@@ -131,7 +127,6 @@ export const Note = memo(function Note({
 		},
 	});
 
-	/** Size after growing by `delta`, kept above the minimum and inside the board. */
 	const sizeFrom = (delta: Point): Size => {
 		const board = getBoardSize();
 		return {
@@ -170,23 +165,20 @@ export const Note = memo(function Note({
 		dispatch({ type: NoteActionType.Delete, id: note.id });
 	};
 
-	/** Moves the note by a few pixels, kept inside the board. */
 	const moveBy = (dx: number, dy: number) => {
 		const target = clampToBoard({ ...note, x: note.x + dx, y: note.y + dy }, getBoardSize());
 		dispatch({ type: NoteActionType.Move, id: note.id, x: target.x, y: target.y });
 	};
 
-	/** Grows or shrinks the note, kept above the minimum size and inside the board. */
 	const resizeBy = (dw: number, dh: number) => {
 		dispatch({ type: NoteActionType.Resize, id: note.id, ...sizeFrom({ x: dw, y: dh }) });
 	};
 
-	/** Keyboard support for the focused note: edit, move, resize and delete without a mouse. */
 	const handleNoteKeyDown = (event: KeyboardEvent<HTMLElement>) => {
 		// Keys typed in the textarea or on the color buttons belong to them.
 		if (event.target !== event.currentTarget) return;
 		const step = event.shiftKey ? KEY_STEP_LARGE : KEY_STEP;
-		// Arrows move the note; Alt + arrows resize it.
+
 		const nudge = event.altKey ? resizeBy : moveBy;
 		const actions: Record<string, () => void> = {
 			Enter: () => setEditing(true),

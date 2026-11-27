@@ -43,7 +43,6 @@ type BoardProps = {
 	ref?: Ref<BoardHandle>;
 	notes: readonly NoteModel[];
 	dispatch: Dispatch<NoteAction>;
-	/** Color for notes created on the board. */
 	newNoteColor: NoteColor;
 	/** True while notes are loading: shows the loading state and blocks the board. */
 	isLoading: boolean;
@@ -51,7 +50,6 @@ type BoardProps = {
 
 export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardProps) {
 	const boardRef = useRef<HTMLElement>(null);
-	// Where the draw started, relative to the board.
 	const drawStartRef = useRef<Point>({ x: 0, y: 0 });
 	// The rectangle being drawn. UI-only, so it lives here and not in the reducer.
 	const [draft, setDraft] = useState<Rect | null>(null);
@@ -61,13 +59,11 @@ export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardPr
 	// One hidden help text for every note, linked with aria-describedby.
 	const helpId = useId();
 
-	// Drives how the trash looks while notes are dragged.
 	const [trashState, setTrashState] = useState<TrashState>(TrashState.Idle);
 
 	// The note just created, so it opens ready to type.
 	const [newNoteId, setNewNoteId] = useState<string | null>(null);
 
-	/** Distance from a point in viewport coordinates to the trash; 0 when over it. */
 	const getTrashDistance = useCallback((pointer: Point) => {
 		const trash = trashRef.current;
 		return trash ? distanceToRect(pointer, trash.getBoundingClientRect()) : Infinity;
@@ -78,7 +74,6 @@ export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardPr
 		return { width: board?.clientWidth ?? 0, height: board?.clientHeight ?? 0 };
 	}, []);
 
-	/** Keeps keyboard focus on the board when a focused note is deleted. */
 	const focusBoard = useCallback(() => boardRef.current?.focus(), []);
 
 	// Stable DOM order, so raising a note doesn't move its node and release pointer capture.
@@ -119,14 +114,12 @@ export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardPr
 		onEnd: (delta) => {
 			setDraft(null);
 			const rect = draftFrom(delta);
-			// A click without movement isn't a draw.
 			if (rect.width < CLICK_TOLERANCE && rect.height < CLICK_TOLERANCE) return;
 			createNote(rect);
 		},
 		onCancel: () => setDraft(null),
 	});
 
-	/** Board coordinates of a pointer event. */
 	const toBoardPoint = (event: MouseEvent<HTMLElement>): Point => {
 		const bounds = event.currentTarget.getBoundingClientRect();
 		return { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
@@ -149,7 +142,6 @@ export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardPr
 		});
 	};
 
-	/** Adds a default-size note in the middle of the board (the header's "Add note" button). */
 	const addCenteredNote = () => {
 		const board = getBoardSize();
 		createNote({
@@ -195,7 +187,6 @@ export function Board({ ref, notes, dispatch, newNoteColor, isLoading }: BoardPr
 							width: draft.width,
 							height: draft.height,
 							zIndex: notes.length,
-							// Preview the color the new note will have.
 							'--draft-color': `var(--note-${newNoteColor})`,
 						} as CSSProperties
 					}

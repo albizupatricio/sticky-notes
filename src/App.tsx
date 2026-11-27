@@ -12,13 +12,10 @@ import styles from './App.module.css';
 function App() {
 	const [state, dispatch] = useReducer(notesReducer, initialNotesState);
 	const [isLoading, setLoading] = useState(true);
-	// Color for the next note the user creates.
 	const [newNoteColor, setNewNoteColor] = useState<NoteColor>(NoteColor.Green);
 
-	// Lets the header ask the board to add a note.
 	const boardRef = useRef<BoardHandle>(null);
 
-	// Initial load from the (mock) API.
 	useEffect(() => {
 		// Ignore the result if the component unmounted first (also covers StrictMode's double run).
 		let isCancelled = false;

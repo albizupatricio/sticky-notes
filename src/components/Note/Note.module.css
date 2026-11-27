@@ -70,7 +70,6 @@
 	}
 }
 
-/* Bottom-right corner handle for resizing. */
 .resizeHandle {
 	position: absolute;
 	right: 5px;
@@ -97,7 +96,6 @@
 	opacity: 1;
 }
 
-/* Feedback that releasing here will delete the note. */
 .overTrash {
 	opacity: 0.55;
 }
