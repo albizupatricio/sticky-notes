@@ -1,7 +1,8 @@
 .app {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	/* The full window height, without depending on html/body/#root having height: 100%. */
+	height: 100dvh;
 	min-width: 1024px;
 	/* The screen may be 768px tall, but the browser's toolbars leave less room for the page. */
 	min-height: 560px;
