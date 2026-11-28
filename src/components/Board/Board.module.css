@@ -27,7 +27,6 @@
 	outline: none;
 }
 
-/* The rectangle shown while drawing a new note, in the color it will have. */
 .draft {
 	position: absolute;
 	top: 0;

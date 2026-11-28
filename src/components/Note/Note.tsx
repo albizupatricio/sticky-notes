@@ -102,7 +102,6 @@ export const Note = memo(function Note({
 			updateTrash(trashStateFor(pointer));
 		},
 		onEnd: (delta) => {
-			// Never crossed the drag threshold: it was a click, nothing to move.
 			if (!hasMovedRef.current) return;
 			hasMovedRef.current = false;
 

@@ -24,7 +24,7 @@
 		background-color 160ms ease;
 }
 
-/* While a note is being dragged: a bigger, easier target. */
+/* When a dragged note gets close: a bigger, easier target. */
 .expanded {
 	width: 320px;
 	height: 120px;
@@ -33,7 +33,6 @@
 	box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.8);
 }
 
-/* The dragged note is over the trash: releasing deletes it. */
 .active {
 	color: #fff;
 	border-style: solid;
@@ -41,7 +40,6 @@
 	background: var(--danger);
 }
 
-/* Heavier text on the red fill, so it reads at a glance. */
 .active .label {
 	font-weight: 700;
 }

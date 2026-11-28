@@ -23,7 +23,7 @@
 	letter-spacing: -0.2px;
 }
 
-/* Two stacked notes: green on top of rose. */
+/* Optical alignment: the sand note adds weight below, so lift the logo to the letters' center. */
 .logo {
 	translate: -1px -2px;
 }
@@ -86,7 +86,6 @@
 	translate: 0 1px;
 }
 
-/* Main action, next to the color it will use. */
 /* Main action in the same language as the header: dark surface, thin border. */
 .addButton {
 	display: flex;

@@ -2,7 +2,6 @@ import { Logo } from '../Logo/Logo';
 
 import styles from './EmptyState.module.css';
 
-/** Shown on an empty board: how to create the first note, and where notes are kept. */
 export function EmptyState() {
 	return (
 		<div className={styles.empty}>

@@ -9,7 +9,6 @@ const COLORS = Object.values(NoteColor);
 type ColorPickerProps = {
 	value: NoteColor;
 	onChange: (color: NoteColor) => void;
-	/** Accessible name of the group, read by screen readers. */
 	label: string;
 };
 
