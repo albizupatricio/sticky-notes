@@ -117,3 +117,26 @@
 	opacity: 0.5;
 	cursor: progress;
 }
+
+.title,
+.addButton,
+.hints li {
+	white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+	.header {
+		gap: 16px;
+	}
+
+	.hints li:first-child {
+		display: none;
+	}
+
+	/* The second hint is now first, so it doesn't need a divider. */
+	.hints li:nth-child(2) {
+		margin-left: 0;
+		padding-left: 0;
+		border-left: 0;
+	}
+}
